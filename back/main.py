@@ -84,7 +84,7 @@ async def execute_daily_tweet(agent_id: str, personality_prompt: str, credential
         logger.error(f"Agent {agent_id} error during tweet: {e}")
     schedule_daily_tweet_job(agent_id, personality_prompt, credentials)
 
-class TwitterReplyBot:
+class TwitterBot:
     def __init__(self, agent_id: str, credentials: dict, openai_api_key: Optional[str] = None):
         self.agent_id = agent_id
         self.api_key = credentials["TWITTER_API_KEY"]
@@ -192,7 +192,7 @@ class TwitterReplyBot:
             if parent_tweet and parent_tweet.id != mention.id and not self.check_already_responded(parent_tweet.id):
                 self.respond_to_mention(mention, parent_tweet)
 
-async def execute_mentions_reply(agent_id: str, credentials: dict, openai_api_key: Optional[str] = None):
+async def execute_mentions(agent_id: str, credentials: dict, openai_api_key: Optional[str] = None):
     try:
         bot = TwitterReplyBot(agent_id, credentials, openai_api_key=openai_api_key)
         await bot.execute_replies()

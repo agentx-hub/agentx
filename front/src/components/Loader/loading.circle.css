@@ -1,0 +1,41 @@
+.loadingCircle {
+    height: 100px;
+    width: 100px;
+    background-color: red;
+}
+
+.loadingCircle {
+    height: 9rem;
+    width: 9rem;
+    border-radius: 50%;
+    border: 2px solid #008ef4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #111;
+}
+
+.innerLoading {
+    height: 100%;
+    width: 100%;
+    border: 4px dashed #008ef4;
+    border-radius: 50%;
+    animation: spin 2s infinite linear;
+}
+
+.after {
+    background-color: #e3e3e4;
+    border-radius: 50%;
+    height: 70%;
+    width: 70%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

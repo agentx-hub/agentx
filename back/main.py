@@ -59,11 +59,6 @@ def schedule_daily_tweet_job(agent_id: str, personality_prompt: str, credentials
     )
     logger.info(f"Agent {agent_id} scheduled for {next_run_time.isoformat()} UTC")
 
-async def execute_daily_tweet(agent_id: str, personality_prompt: str, credentials: dict):
-    logger.info(f"Agent {agent_id} executing daily tweet at {datetime.utcnow().isoformat()} UTC")
-    if not all([personality_prompt, credentials.get("TWITTER_API_KEY"), credentials.get("TWITTER_API_SECRET_KEY"), credentials.get("TWITTER_ACCESS_TOKEN"), credentials.get("TWITTER_ACCESS_TOKEN_SECRET")]):
-        logger.error(f"Agent {agent_id} missing credentials")
-        return
     creative_agent = agents_system.creative_tweet_agent()
     advanced_agent = agents_system.advanced_creative_agent()
     posting_agent = agents_system.tweet_poster_agent(agent_id)
@@ -82,7 +77,6 @@ async def execute_daily_tweet(agent_id: str, personality_prompt: str, credential
         logger.info(f"Agent {agent_id} tweet published successfully. Publish result: {publish_result}. Engagement analysis: {engagement_result}")
     except Exception as e:
         logger.error(f"Agent {agent_id} error during tweet: {e}")
-    schedule_daily_tweet_job(agent_id, personality_prompt, credentials)
 
 class TwitterReplyBot:
     def __init__(self, agent_id: str, credentials: dict, openai_api_key: Optional[str] = None):
@@ -101,7 +95,6 @@ class TwitterReplyBot:
             access_token_secret=self.acc_secret,
             wait_on_rate_limit=True
         )
-        self.db = LocalJSONDatabase()
         self.twitter_me_id = self.get_me_id()
         self.tweet_response_limit = 35
         if self.openai_api_key:
@@ -192,12 +185,7 @@ class TwitterReplyBot:
             if parent_tweet and parent_tweet.id != mention.id and not self.check_already_responded(parent_tweet.id):
                 self.respond_to_mention(mention, parent_tweet)
 
-async def execute_mentions_reply(agent_id: str, credentials: dict, openai_api_key: Optional[str] = None):
-    try:
-        bot = TwitterReplyBot(agent_id, credentials, openai_api_key=openai_api_key)
-        await bot.execute_replies()
-    except Exception as e:
-        logger.error(f"Agent {agent_id} error in execute_mentions_reply: {e}")
+
 
 @app.post("/create-agent")
 async def create_agent(req: CreateAgentRequest):
@@ -249,7 +237,6 @@ async def create_agent(req: CreateAgentRequest):
     }
     await agents_db.insert(agent_data)
     try:
-        schedule_daily_tweet_job(agent_id, req.personality_prompt, credentials)
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error scheduling daily tweet")
     try:
